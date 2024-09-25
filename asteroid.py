@@ -1,5 +1,6 @@
-import pygame
 import random
+
+import pygame
 
 from circleshape import CircleShape
 from constants import ASTEROID_MIN_RADIUS, ASTEROID_POINTS
@@ -8,11 +9,18 @@ from constants import ASTEROID_MIN_RADIUS, ASTEROID_POINTS
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
-        self.explosion_sounds = [
-            pygame.mixer.Sound("sounds/explosion-1.wav"),
-            pygame.mixer.Sound("sounds/explosion-2.wav"),
-            pygame.mixer.Sound("sounds/explosion-3.wav"),
+        self.explosion_sounds = []
+        sound_files = [
+            "sounds/explosion-1.wav",
+            "sounds/explosion-2.wav",
+            "sounds/explosion-3.wav",
         ]
+        for sound_file in sound_files:
+            try:
+                self.explosion_sounds.append(pygame.mixer.Sound(sound_file))
+            except pygame.error:
+                print(f"Error: Sound file '{sound_file}' not found.")
+                self.explosion_sounds.append(None)
 
     def draw(self, screen):
         pygame.draw.circle(screen, "white", self.position, self.radius, 2)
@@ -22,7 +30,9 @@ class Asteroid(CircleShape):
 
     def split(self):
         self.kill()
-        random.choice(self.explosion_sounds).play()
+        sound = random.choice(self.explosion_sounds)
+        if sound:
+            sound.play()
         if self.radius <= ASTEROID_MIN_RADIUS:
             return ASTEROID_POINTS[0]
 

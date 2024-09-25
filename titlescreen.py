@@ -1,8 +1,8 @@
+import os
 import sys
 
 import pygame
 
-from asteroid import Asteroid
 from asteroidfield import AsteroidField
 
 
@@ -17,9 +17,12 @@ class TitleScreen:
         self.waiting = True
         self.dt = 0
 
-        # Load and play title screen music
-        pygame.mixer.music.load("sounds/intro.mp3")
-        pygame.mixer.music.play(-1)
+        music_file = "sounds/intro.mp3"
+        if os.path.exists(music_file):
+            pygame.mixer.music.load(music_file)
+            pygame.mixer.music.play(-1)
+        else:
+            print(f"Error: Music file '{music_file}' not found.")
 
         AsteroidField(1.6, 20, 40)
 
