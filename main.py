@@ -6,20 +6,17 @@ from constants import *
 from gameoverscreen import GameOverScreen
 from player import Player
 from shot import Shot
+from titlescreen import TitleScreen
 
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    font = pygame.font.Font(None, 36)
     clock = pygame.time.Clock()
     dt = 0
 
-    # Load and play background music
-    pygame.mixer.init()
-    pygame.mixer.music.load("sounds/music.mp3")
-    pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play(-1)
-
+    # initialize game elements
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
@@ -27,15 +24,28 @@ def main():
 
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = updatable
-    AsteroidField()
-
-    Player.containers = (updatable, drawable)
-    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
     Shot.containers = (shots, updatable, drawable)
 
     score = 0
-    font = pygame.font.Font(None, 36)
+
+    title_screen = TitleScreen(screen, font, updatable, drawable, asteroids, clock)
+    # Display title screen until player presses a key
+    while title_screen.waiting:
+        title_screen.display()
+        title_screen.handle_input()
+
+    #Add player after the title screen
+    Player.containers = (updatable, drawable)
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
+    AsteroidField()
+
+    # Load and play background music
+    pygame.mixer.init()
+    pygame.mixer.music.load("sounds/music.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
 
     while True:
         for event in pygame.event.get():
