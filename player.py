@@ -40,13 +40,13 @@ class Player(CircleShape):
         self.shot_cooldown -= dt
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_q]:
+        if keys[pygame.K_q] or keys[pygame.K_LEFT]:
             self.rotate(-dt)
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             self.rotate(dt)
-        if keys[pygame.K_z]:
+        if keys[pygame.K_z] or keys[pygame.K_UP]:
             self.move(dt)
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
