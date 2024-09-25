@@ -20,6 +20,7 @@ class TitleScreen:
         music_file = "sounds/intro.mp3"
         if os.path.exists(music_file):
             pygame.mixer.music.load(music_file)
+            pygame.mixer.music.set_volume(0.3)
             pygame.mixer.music.play(-1)
         else:
             print(f"Error: Music file '{music_file}' not found.")

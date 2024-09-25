@@ -1,11 +1,11 @@
 import os
-
 import pygame
 
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from constants import *
 from gameoverscreen import GameOverScreen
+from initialsinputscreen import InitialsInputScreen
 from player import Player
 from shot import Shot
 from titlescreen import TitleScreen
@@ -18,9 +18,10 @@ def main():
     font = pygame.font.Font(None, 36)
     clock = pygame.time.Clock()
     dt = 0
+    high_scores = [('AAA', 0), ('BBB', 0), ('CCC', 0)]
 
     while True:
-        # initialize game elements
+        # Initialize game elements
         updatable = pygame.sprite.Group()
         drawable = pygame.sprite.Group()
         asteroids = pygame.sprite.Group()
@@ -33,6 +34,7 @@ def main():
         score = 0
 
         title_screen = TitleScreen(screen, font, updatable, drawable, asteroids, clock)
+
         # Display title screen until player presses a key
         while title_screen.waiting:
             title_screen.display()
@@ -64,9 +66,22 @@ def main():
                 sprite.update(dt)
             for asteroid in asteroids:
                 if asteroid.collides_with(player):
-                    game_over_screen = GameOverScreen(screen, font, score)
+                    game_over_screen = GameOverScreen(screen, font, score, high_scores)
                     game_over_screen.display()
 
+                    # Check if the player has a new high score
+                    if game_over_screen.is_high_score():
+                        initials_input_screen = InitialsInputScreen(screen, font, score)
+                        initials = None
+                        while initials is None:
+                            initials_input_screen.display()  # Keep displaying the initials input screen
+                            initials = initials_input_screen.handle_input()  # Get the initials input
+
+                        game_over_screen.add_high_score(initials)
+                        high_scores = game_over_screen.high_scores
+
+                    game_over_screen.display()  # Display the updated game over screen
+                    game_over_screen.waiting = True  # Reset waiting state
                     while game_over_screen.waiting:
                         restart = game_over_screen.handle_input()
                         if restart:
@@ -75,6 +90,7 @@ def main():
                     if not game_over:
                         return
 
+                # Check collisions between asteroids and shots
                 for shot in shots:
                     if asteroid.collides_with(shot):
                         score += asteroid.split()
@@ -82,6 +98,7 @@ def main():
 
             screen.fill("black")
 
+            # Render score
             score_text = font.render(f"Score: {score}", True, "yellow")
             screen.blit(score_text, (10, 10))
 
