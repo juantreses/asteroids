@@ -8,6 +8,11 @@ from constants import ASTEROID_MIN_RADIUS, ASTEROID_POINTS
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
+        self.explosion_sounds = [
+            pygame.mixer.Sound("sounds/explosion-1.wav"),
+            pygame.mixer.Sound("sounds/explosion-2.wav"),
+            pygame.mixer.Sound("sounds/explosion-3.wav"),
+        ]
 
     def draw(self, screen):
         pygame.draw.circle(screen, "white", self.position, self.radius, 2)
@@ -17,6 +22,7 @@ class Asteroid(CircleShape):
 
     def split(self):
         self.kill()
+        random.choice(self.explosion_sounds).play()
         if self.radius <= ASTEROID_MIN_RADIUS:
             return ASTEROID_POINTS[0]
 
