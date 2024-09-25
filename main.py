@@ -1,10 +1,9 @@
-import sys
-
 import pygame
 
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from constants import *
+from gameoverscreen import GameOverScreen
 from player import Player
 from shot import Shot
 
@@ -14,6 +13,12 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
     dt = 0
+
+    # Load and play background music
+    pygame.mixer.init()
+    pygame.mixer.music.load("sounds/music.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -41,8 +46,14 @@ def main():
             sprite.update(dt)
         for asteroid in asteroids:
             if asteroid.collides_with(player):
-                print(f"Game Over! Score: {score}")
-                sys.exit()
+                game_over = GameOverScreen(screen, font, score)
+                game_over.display()
+
+                while game_over.waiting:
+                    restart = game_over.handle_input()
+                    if restart:
+                        main()  # Restart the game by calling main()
+                        return
 
             for shot in shots:
                 if asteroid.collides_with(shot):
