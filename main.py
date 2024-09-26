@@ -65,30 +65,32 @@ def main():
             for sprite in updatable:
                 sprite.update(dt)
             for asteroid in asteroids:
-                if asteroid.collides_with(player):
-                    game_over_screen = GameOverScreen(screen, font, score, high_scores)
-                    game_over_screen.display()
+                if not player.invincible and asteroid.collides_with(player):
+                    player.lose_life()
+                    if player.lives <= 0:
+                        game_over_screen = GameOverScreen(screen, font, score, high_scores)
+                        game_over_screen.display()
 
-                    # Check if the player has a new high score
-                    if game_over_screen.is_high_score():
-                        initials_input_screen = InitialsInputScreen(screen, font, score)
-                        initials = None
-                        while initials is None:
-                            initials_input_screen.display()  # Keep displaying the initials input screen
-                            initials = initials_input_screen.handle_input()  # Get the initials input
+                        # Check if the player has a new high score
+                        if game_over_screen.is_high_score():
+                            initials_input_screen = InitialsInputScreen(screen, font, score)
+                            initials = None
+                            while initials is None:
+                                initials_input_screen.display()  # Keep displaying the initials input screen
+                                initials = initials_input_screen.handle_input()  # Get the initials input
 
-                        game_over_screen.add_high_score(initials)
-                        high_scores = game_over_screen.high_scores
+                            game_over_screen.add_high_score(initials)
+                            high_scores = game_over_screen.high_scores
 
-                    game_over_screen.display()  # Display the updated game over screen
-                    game_over_screen.waiting = True  # Reset waiting state
-                    while game_over_screen.waiting:
-                        restart = game_over_screen.handle_input()
-                        if restart:
-                            game_over = True
-                            break
-                    if not game_over:
-                        return
+                        game_over_screen.display()  # Display the updated game over screen
+                        game_over_screen.waiting = True  # Reset waiting state
+                        while game_over_screen.waiting:
+                            restart = game_over_screen.handle_input()
+                            if restart:
+                                game_over = True
+                                break
+                        if not game_over:
+                            return
 
                 # Check collisions between asteroids and shots
                 for shot in shots:
@@ -98,9 +100,11 @@ def main():
 
             screen.fill("black")
 
-            # Render score
+            # Render texts
+            lives_text = font.render(f"Lives: {player.lives}", True, "white")
             score_text = font.render(f"Score: {score}", True, "yellow")
             screen.blit(score_text, (10, 10))
+            screen.blit(lives_text, (10, 50))
 
             for sprite in drawable:
                 sprite.draw(screen)
